@@ -4,20 +4,25 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function CheckPage() {
-  const [txHash, setTxHash] = useState("0xd13cddfa361b0ca0085e84e1cbc5848ea4a286e77f44d059a94520f01c955acb");
-  const [result, setResult] = useState(null);
+  const [txHash, setTxHash] = useState(
+    "0xd13cddfa361b0ca0085e84e1cbc5848ea4a286e77f44d059a94520f01c955acb"
+  );
+  const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function querySubgraph(query: string) {
     try {
-      const response = await fetch('http://localhost:8000/subgraphs/name/oro-token-claims', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query })
-      });
+      const response = await fetch(
+        "http://localhost:8000/subgraphs/name/oro-token-claims",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+        }
+      );
       return await response.json();
     } catch (err) {
       console.error("Error querying subgraph:", err);
@@ -42,7 +47,7 @@ export default function CheckPage() {
           transactionHash
         }
       }`;
-      
+
       const data = await querySubgraph(query);
       setResult(data);
     } catch (err) {
@@ -74,7 +79,7 @@ export default function CheckPage() {
           uniqueDays
         }
       }`;
-      
+
       const data = await querySubgraph(query);
       setResult(data);
     } catch (err) {
@@ -87,7 +92,7 @@ export default function CheckPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Subgraph Transaction Checker</h1>
-      
+
       <div className="mb-6">
         <Link href="/missions" className="text-blue-500 hover:underline">
           Back to Missions
@@ -95,24 +100,26 @@ export default function CheckPage() {
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Transaction Hash:</label>
-        <input 
-          type="text" 
-          value={txHash} 
+        <label className="block text-sm font-medium mb-2">
+          Transaction Hash:
+        </label>
+        <input
+          type="text"
+          value={txHash}
           onChange={(e) => setTxHash(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded text-black"
         />
       </div>
 
       <div className="flex space-x-4 mb-6">
-        <button 
+        <button
           onClick={checkTransaction}
           disabled={loading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
         >
           {loading ? "Checking..." : "Check Transaction"}
         </button>
-        <button 
+        <button
           onClick={checkStats}
           disabled={loading}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
@@ -137,4 +144,4 @@ export default function CheckPage() {
       )}
     </div>
   );
-} 
+}

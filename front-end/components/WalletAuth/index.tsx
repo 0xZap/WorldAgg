@@ -2,6 +2,7 @@
 import { MiniKit, WalletAuthInput } from "@worldcoin/minikit-js";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 
 const walletAuthInput = (nonce: string): WalletAuthInput => {
   return {
@@ -78,9 +79,11 @@ export const WalletAuth = () => {
           <div className="text-green-600 font-medium">✓ Connected</div>
           <div className="flex items-center space-x-2">
             {user?.profilePictureUrl && (
-              <img
+              <Image
                 src={user.profilePictureUrl}
                 alt="Profile"
+                width={32}
+                height={32}
                 className="w-8 h-8 rounded-full"
               />
             )}

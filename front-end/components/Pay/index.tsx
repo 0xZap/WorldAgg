@@ -8,7 +8,11 @@ import {
 import { Button, Input, Select } from "@worldcoin/mini-apps-ui-kit-react";
 import { useState } from "react";
 
-const sendPayment = async (recipientAddress: string, selectedToken: Tokens, amount: number) => {
+const sendPayment = async (
+  recipientAddress: string,
+  selectedToken: Tokens,
+  amount: number
+) => {
   try {
     const res = await fetch(`/api/initiate-payment`, {
       method: "POST",
@@ -51,7 +55,11 @@ const handlePay = async (
   }
 
   setStatus("Processing payment...");
-  const sendPaymentResponse = await sendPayment(recipientAddress, selectedToken, amount);
+  const sendPaymentResponse = await sendPayment(
+    recipientAddress,
+    selectedToken,
+    amount
+  );
   const response = sendPaymentResponse?.finalPayload;
 
   if (!response) {
@@ -77,7 +85,9 @@ const handlePay = async (
 };
 
 export const PayBlock = () => {
-  const [recipientAddress, setRecipientAddress] = useState(process.env.NEXT_PUBLIC_RECIPIENT_ADDRESS || "");
+  const [recipientAddress, setRecipientAddress] = useState(
+    process.env.NEXT_PUBLIC_RECIPIENT_ADDRESS || ""
+  );
   const [selectedToken, setSelectedToken] = useState<Tokens>(Tokens.WLD);
   const [amount, setAmount] = useState<number>(0.5);
   const [status, setStatus] = useState<string | null>(null);
@@ -86,49 +96,66 @@ export const PayBlock = () => {
     <div className="flex flex-col items-center gap-4 p-6 border rounded-lg shadow-sm">
       <h3 className="text-xl font-semibold">Buy me a coffee ☕</h3>
       <p className="text-center text-gray-600 mb-4">
-        Enjoyed this app? Buy me a coffee! 🎉 Or change the address to support someone else!
+        Enjoyed this app? Buy me a coffee! 🎉 Or change the address to support
+        someone else!
       </p>
 
       <div className="w-full space-y-4">
-        <Input
-          label="Recipient Address"
-          value={recipientAddress}
-          onChange={(e) => setRecipientAddress(e.target.value)}
-          placeholder="0x..."
-        />
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Recipient Address
+          </label>
+          <Input
+            value={recipientAddress}
+            onChange={(e) => setRecipientAddress(e.target.value)}
+            placeholder="0x..."
+          />
+        </div>
 
         <div className="flex gap-4">
-          <Select
-            label="Token"
-            value={selectedToken}
-            onChange={(value) => setSelectedToken(value as Tokens)}
-            options={[
-              { label: "WLD", value: Tokens.WLD },
-              { label: "USDC", value: Tokens.USDCE }
-            ]}
-            className="flex-1"
-          />
+          <div className="flex-1 space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Token
+            </label>
+            <Select
+              value={selectedToken}
+              onChange={(value) => setSelectedToken(value as Tokens)}
+              options={[
+                { label: "WLD", value: Tokens.WLD },
+                { label: "USDC", value: Tokens.USDCE },
+              ]}
+            />
+          </div>
 
-          <Input
-            label="Amount"
-            type="number"
-            value={amount.toString()}
-            onChange={(e) => setAmount(parseFloat(e.target.value))}
-            placeholder="0.5"
-            className="flex-1"
-          />
+          <div className="flex-1 space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Amount
+            </label>
+            <Input
+              type="number"
+              value={amount.toString()}
+              onChange={(e) => setAmount(parseFloat(e.target.value))}
+              placeholder="0.5"
+            />
+          </div>
         </div>
       </div>
 
       <Button
-        onClick={() => handlePay(recipientAddress, selectedToken, amount, setStatus)}
+        onClick={() =>
+          handlePay(recipientAddress, selectedToken, amount, setStatus)
+        }
         className="w-full mt-2"
       >
         Buy Coffee
       </Button>
 
       {status && (
-        <div className={`mt-2 text-center ${status.includes("Thank you") ? "text-green-600" : "text-red-600"}`}>
+        <div
+          className={`mt-2 text-center ${
+            status.includes("Thank you") ? "text-green-600" : "text-red-600"
+          }`}
+        >
           {status}
         </div>
       )}

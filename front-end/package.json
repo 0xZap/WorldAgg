@@ -12,6 +12,7 @@
     "@worldcoin/mini-apps-ui-kit-react": "^0.0.6",
     "@worldcoin/minikit-js": "1.6.1",
     "eruda": "^3.2.3",
+    "framer-motion": "^12.6.1",
     "jose": "^6.0.10",
     "lucide-react": "^0.483.0",
     "nanoid": "^5.1.4",
@@ -19,13 +20,14 @@
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "framer-motion": "^12.6.1",
     "viem": "^2.23.5"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.6",
     "postcss": "^8",

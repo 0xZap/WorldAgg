@@ -1,9 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Clock, ExternalLink, Sparkles, TrendingUp, Wallet, BarChart3 } from "lucide-react";
+import {
+  Clock,
+  ExternalLink,
+  Sparkles,
+  TrendingUp,
+  Wallet,
+  BarChart3,
+} from "lucide-react";
 import { getTokensPrices } from "./utils/getPriceData";
 import { WalletHeader } from "@/components/WalletHeader";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 // Define project type
 interface Project {
@@ -219,8 +227,8 @@ export default function Home() {
                   Holdings Feature
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
-                  Advanced portfolio tracking is coming soon! We're working hard
-                  to bring you comprehensive insights into your crypto
+                  Advanced portfolio tracking is coming soon! We&apos;re working
+                  hard to bring you comprehensive insights into your crypto
                   investments.
                 </p>
                 <div className="bg-blue-50 rounded-lg p-3">
@@ -294,9 +302,11 @@ export default function Home() {
                 >
                   <div className="flex p-4">
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-blue-400 flex items-center justify-center mr-3">
-                      <img
+                      <Image
                         src={project.tokenIcon || "/placeholder.svg"}
                         alt={`${project.tokenSymbol} icon`}
+                        width={28}
+                        height={28}
                         className="w-7 h-7"
                       />
                     </div>
