@@ -155,7 +155,7 @@ export default function Home() {
       >
         {/* Portfolio Value Card */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden mt-6 mb-6">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-400 px-5 pt-6 pb-8">
+          {/* <div className="bg-gradient-to-r from-blue-600 to-blue-400 px-5 pt-6 pb-8">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-sm font-medium text-blue-100 mb-1">Portfolio Value</h2>
@@ -166,10 +166,10 @@ export default function Home() {
                 <Wallet className="h-6 w-6 text-white" />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Tabs for Holdings/Trends */}
-          <div className="flex border-b">
+          {/* <div className="flex border-b">
             <button
               className={`flex-1 py-3 text-sm font-medium ${
                 activeTab === "holdings" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
@@ -186,10 +186,10 @@ export default function Home() {
             >
               Trends
             </button>
-          </div>
+          </div> */}
 
           {/* Holdings Section */}
-          {activeTab === "holdings" && (
+          {/* {activeTab === "holdings" && (
             <div className="p-4">
               <div className="bg-white rounded-xl p-6 text-center">
                 <div className="flex justify-center mb-4">
@@ -209,10 +209,10 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Top Gainer Section */}
-          {activeTab === "trends" && topGainer && !loading && (
+          {/* {activeTab === "trends" && topGainer && !loading && (
             <div className="p-4">
               <div className="bg-green-50 rounded-xl p-4">
                 <div className="flex items-center gap-4">
@@ -230,7 +230,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Projects List */}

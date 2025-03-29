@@ -4,9 +4,9 @@ import "./globals.css";
 import MiniKitProvider from "@/components/minikit-provider";
 import dynamic from "next/dynamic";
 import NextAuthProvider from "@/components/next-auth-provider";
-import { WalletProvider } from "@/context/WalletContext";
 import "@worldcoin/mini-apps-ui-kit-react/styles.css";
-import { FooterTabs } from "@/components/FooterTabs";
+import { FooterTabsWrapper } from "@/components/FooterTabsWrapper";
+import { SessionProvider } from "@/providers/session-provider";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -40,6 +40,7 @@ export default function RootLayout({
       ssr: false,
     }
   );
+  
   return (
     <html lang="en">
       <head>
@@ -61,16 +62,15 @@ export default function RootLayout({
         min-h-screen 
         flex 
         flex-col
-        pb-24
       `}
       >
         <NextAuthProvider>
           <ErudaProvider>
             <MiniKitProvider>
-              <WalletProvider>
+              <SessionProvider>
                 {children}
-                <FooterTabs />
-              </WalletProvider>
+                <FooterTabsWrapper />
+              </SessionProvider>
             </MiniKitProvider>
           </ErudaProvider>
         </NextAuthProvider>
