@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { missions, type Mission } from "@/lib/data"
+import { missions, type Mission, Icons, iconMapping } from "@/lib/data"
 import { verifyOnchainActivity, generateMockActivity } from "@/lib/onchain"
 import { 
   Clock, 
@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react"
 import { MissionsDiv } from "@/components/WalletHeader"
 import { motion, AnimatePresence } from "framer-motion"
 import { Session } from "next-auth"
+import React from "react"
 
 // Group missions by category (difficulty level)
 const groupedMissions: Record<string, Mission[]> = {
@@ -125,7 +126,6 @@ export default function MissionsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-50">
-
       {/* Toast notification */}
       <AnimatePresence>
         {toastVisible && (
@@ -219,6 +219,11 @@ export default function MissionsPage() {
             if (onchainProgress) {
               progressPercentage = onchainProgress.progress.percentage
             }
+            
+            // Define the correct icon for mission
+            const UnclaimedIcon = mission.icon
+              ? iconMapping[mission.icon] || Award
+              : Award;
 
             return (
               <motion.div
@@ -245,10 +250,8 @@ export default function MissionsPage() {
                       }`}>
                         {isClaimed ? (
                           <CheckCircle className="h-5 w-5 text-green-600" />
-                        ) : mission.onchainVerification ? (
-                          <Coins className="h-5 w-5 text-blue-600" />
                         ) : (
-                          <Award className="h-5 w-5 text-gray-500" />
+                         <UnclaimedIcon className="h-5 w-5 text-gray-500" />
                         )}
                       </div>
                       <div>
