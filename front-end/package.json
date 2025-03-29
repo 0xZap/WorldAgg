@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
-    "@worldcoin/mini-apps-ui-kit-react": "^0.0.6",
+    "@worldcoin/mini-apps-ui-kit-react": "^1.0.0-canary.4",
     "@worldcoin/minikit-js": "1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

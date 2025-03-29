@@ -12,6 +12,7 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
 
   const handleWalletAuth = async () => {
     if (!MiniKit.isInstalled()) {
+      console.error("MiniKit is not installed");
       return;
     }
 
@@ -19,15 +20,18 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
     try {
       const res = await fetch("/api/nonce");
       const { nonce } = await res.json();
-      console.log("nonce", nonce);
+      
+      // Create a proper expiration time (1 hour from now)
+      const expirationTime = new Date(Date.now() + 60 * 60 * 1000);
+      
       const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
         nonce,
-        expirationTime: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
+        expirationTime,
         statement: "Sign in with your World ID wallet",
       });
 
-      if (finalPayload.status === "error") {
-        throw new Error(finalPayload.error_code);
+      if (!finalPayload || finalPayload.status === "error") {
+        throw new Error(finalPayload?.error_code || "Unknown wallet auth error");
       }
 
       const verifyRes = await fetch("/api/complete-siwe", {
@@ -40,12 +44,15 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
           nonce,
         }),
       });
-      console.log("verifyRes", verifyRes);
+      
+      if (!verifyRes.ok) {
+        throw new Error(`Verification failed with status: ${verifyRes.status}`);
+      }
+      
       const verification = await verifyRes.json();
-      console.log("verification", verification);
 
       if (verification.isValid) {
-        await signIn("worldcoin-wallet", {
+        const signInResult = await signIn("worldcoin-wallet", {
           message: finalPayload.message,
           signature: finalPayload.signature,
           address: finalPayload.address,
@@ -53,11 +60,18 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
           redirect: false,
         });
 
+        if (signInResult?.error) {
+          throw new Error(`Sign in failed: ${signInResult.error}`);
+        }
+
         // Call onSuccess if provided
         if (onSuccess) onSuccess();
+      } else {
+        throw new Error("Verification failed: " + (verification.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Wallet auth error:", error);
+      // You might want to show an error message to the user here
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +81,7 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
     <button
       onClick={handleWalletAuth}
       disabled={isLoading}
-      className="relative w-full overflow-hidden bg-[#4ecdc4] font-serif text-lg font-bold uppercase tracking-widest text-black hover:bg-[#3db9b1] px-4 py-2 rounded-lg shadow-md transition-colors disabled:opacity-50"
+      className="relative w-full overflow-hidden bg-blue-500 font-serif text-lg font-bold uppercase tracking-widest text-white px-4 py-2 rounded-lg shadow-md transition-colors disabled:opacity-50"
     >
       {isLoading ? (
         <div className="flex items-center justify-center">
@@ -77,7 +91,7 @@ export function WalletAuthButton({ onSuccess }: WalletAuthButtonProps) {
       ) : (
         <div className="flex items-center justify-center">
           <span className="relative z-10">CONNECT</span>
-          <div className="absolute -right-4 bottom-0 h-full w-20 transform skew-x-12 bg-[#d13438] opacity-70"></div>
+          {/* <div className="absolute -right-4 bottom-0 h-full w-20 transform skew-x-12 bg-[#d13438] opacity-70"></div> */}
         </div>
       )}
     </button>
