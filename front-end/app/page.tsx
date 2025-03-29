@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Clock, Sparkles, TrendingUp, TrendingDown, Wallet, BarChart3, Coins, ArrowUpRight } from "lucide-react"
+import { BarChart3, Coins, ArrowUpRight } from "lucide-react"
 import { getTokensPrices } from "./utils/getPriceData"
 import { motion } from "framer-motion"
 
@@ -235,8 +235,13 @@ export default function Home() {
 
         {/* Projects List */}
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Projects</h2>
+        <div className="relative bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl shadow-sm p-4 mb-6 max-w-md mx-auto w-full">
+      <div>
+        <h1 className="text-2xl font-bold mb-2 text-white">Projects</h1>
+        <p className="text-sm text-white/90">
+          Daily claims are available for all these projects
+        </p>
+      </div>
             {activeTab === "holdings" && (
               <div className="text-sm text-gray-500 flex items-center">
                 <BarChart3 className="w-4 h-4 mr-1" /> {projects.length} total

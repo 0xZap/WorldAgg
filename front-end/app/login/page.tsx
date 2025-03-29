@@ -23,9 +23,9 @@ export default function LoginPage() {
       '/Free_World.png',
       '/Golden_Wld.png',
       '/Learn_world.png',
-      '/Orb-World.png',
-      '/Oro-World.png',
-      '/Sapien_World.jpg'
+      '/Orb_World.png',
+      '/Oro_World.jpg',
+      '/Sapien_Wld.jpg'
     ]
     
     // Create an array of floating icons with random positions
@@ -76,11 +76,12 @@ export default function LoginPage() {
               repeatType: "reverse",
             }}
           >
-            <div className="relative w-16 h-16 filter blur-[1px] opacity-15">
+            <div className="relative w-16 h-16 rounded-full filter blur-[1px] opacity-15">
               <Image
                 src={icon.image}
                 alt="World icon"
                 fill
+                className="rounded-full"
                 style={{ objectFit: "contain" }}
               />
             </div>
