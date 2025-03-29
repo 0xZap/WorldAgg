@@ -91,7 +91,7 @@ export const WalletAuth = () => {
                   user?.walletAddress.slice(-4)}
             </span>
           </div>
-          <Button onClick={handleSignOut} variant="secondary" size="md">
+          <Button onClick={handleSignOut} variant="secondary" size="sm">
             Sign Out
           </Button>
         </div>
