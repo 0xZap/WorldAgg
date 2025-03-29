@@ -14,7 +14,7 @@ import {
   TrendingUp
 } from "lucide-react"
 import { Button } from "@worldcoin/mini-apps-ui-kit-react"
-import { WalletHeader } from "@/components/WalletHeader"
+import { MissionsDiv } from "@/components/WalletHeader"
 import { useWallet } from "@/context/WalletContext"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -124,8 +124,7 @@ export default function MissionsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-50">
-      <WalletHeader />
-      
+
       {/* Toast notification */}
       <AnimatePresence>
         {toastVisible && (
@@ -155,10 +154,7 @@ export default function MissionsPage() {
         transition={{ duration: 0.4 }}
       >
         {/* Header Section */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Missions</h1>
-          <p className="text-sm text-gray-600">Complete tasks to earn rewards</p>
-        </div>
+        <MissionsDiv />
 
         {/* User Stats Card */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
@@ -181,7 +177,7 @@ export default function MissionsPage() {
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-gray-500">Address</span>
-              <span className="font-mono text-xs truncate max-w-[180px]">{userAddress}</span>
+              <span className="font-medium text-xs truncate max-w-[180px]">{userAddress}</span>
             </div>
             
             <div className="flex items-center justify-between text-sm">
@@ -263,13 +259,15 @@ export default function MissionsPage() {
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <div className={`px-3 py-1 rounded-full text-xs mr-2 ${
-                        isClaimed ? "bg-green-100 text-green-700" : 
-                        onchainProgress?.isCompleted ? "bg-blue-100 text-blue-700" : 
-                        "bg-gray-100 text-gray-700"
-                      }`}>
-                        {isClaimed ? "Completed" : onchainProgress?.isCompleted ? "Ready" : "In Progress"}
-                      </div>
+                    <div className={`flex items-center justify-center flex-shrink-0 w-24 px-3 py-1 rounded-full text-xs mr-2 ${
+                      isClaimed 
+                        ? "bg-green-100 text-green-700" 
+                        : onchainProgress?.isCompleted 
+                          ? "bg-blue-100 text-blue-700" 
+                          : "bg-gray-100 text-gray-700"
+                    }`}>
+                      {isClaimed ? "Completed" : onchainProgress?.isCompleted ? "Ready" : "In Progress"}
+                    </div>
                       <ChevronRight className={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                     </div>
                   </div>

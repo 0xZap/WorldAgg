@@ -106,6 +106,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       */
 
       // Mock login for development
+      
       setTimeout(() => {
         setUser({
           walletAddress: "0x123abc456def789ghi",
@@ -114,6 +115,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         });
         setLoading(false);
       }, 500);
+  
     } catch (error) {
       console.error("Error connecting wallet:", error);
       setLoading(false);
