@@ -13,15 +13,15 @@ export default function LoginPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   
   const imagePaths = [
-    '/Asado_Wld.jpg',
-    '/Clip_World.png',
-    '/DNA_World.png',
-    '/Egg_World.png',
-    '/Free_World.png',
+    '/Oro_World.jpg',
     '/Golden_Wld.png',
+    '/Clip_World.png',
+    '/Egg_World.png',
+    '/Asado_Wld.jpg',
+    '/DNA_World.png',
+    '/Free_World.png',
     '/Learn_world.png',
     '/Orb_World.png',
-    '/Oro_World.jpg',
     '/Sapien_Wld.jpg'
   ]
 
