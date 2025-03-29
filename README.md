@@ -14,7 +14,7 @@ This project consists of three main components:
 
 ## Running the Graph Node
 
-The Graph Node runs in Docker and requires PostgreSQL and IPFS.
+The Graph Node runs in Docker and requires PostgreSQL and IPFS
 
 ```bash
 # Navigate to the graph node directory
