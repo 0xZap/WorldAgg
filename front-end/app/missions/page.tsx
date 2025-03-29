@@ -53,7 +53,7 @@ export default function MissionsPage() {
     const progressData: Record<string, any> = {}
     
     // Use connected wallet address if available
-    const addressToUse = session?.data?.walletAddress || userAddress
+    const addressToUse = session?.user?.address || userAddress
     
     // Verify on-chain activity for all missions with on-chain verification
     for (const mission of missions) {
@@ -75,8 +75,8 @@ export default function MissionsPage() {
 
   // Set user address when wallet connects
   useEffect(() => {
-    if (session?.data?.walletAddress) {
-      setUserAddress(session.data.walletAddress)
+    if (session?.user?.address) {
+      setUserAddress(session.user.address)
     }
   }, [session])
 

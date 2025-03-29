@@ -5,7 +5,7 @@ import { FooterTabs } from "./FooterTabs";
 
 export function FooterTabsWrapper() {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/login";
+  const isLoginPage = pathname === "/";
 
   if (isLoginPage) {
     return null;

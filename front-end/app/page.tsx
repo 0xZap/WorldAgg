@@ -1,335 +1,203 @@
 "use client"
-import { useEffect, useState } from "react"
-import { BarChart3, Coins, ArrowUpRight } from "lucide-react"
-import { getTokensPrices } from "./utils/getPriceData"
-import { motion } from "framer-motion"
 
-// Define project type
-interface Project {
-  id: string
-  name: string
-  description: string
-  tokenSymbol: string
-  tokenIcon: string
-  tokenPrice: number
-  tokenAmount: number
-  tokenAddress: string
-  projectUrl: string
-}
+import { Button } from "@/components/ui/button"
+import { useState, useEffect, useRef } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { WalletAuthButton } from "@/components/wallet-auth-button"
+import Image from "next/image"
+import { useUser } from "@/lib/hooks/use-user";
+import { useToast, Toaster } from "@worldcoin/mini-apps-ui-kit-react/Toast";
+import { MiniKit } from "@worldcoin/minikit-js";
+import { authenticateWithWallet } from "@/lib/auth";
 
-// Define top gainer type
-interface TopGainer {
-  symbol: string
-  change: number
-  price: number
-}
+export default function LoginPage() {
 
-// Helper function to format price with appropriate decimal places
-const formatPrice = (price: number): string => {
-  if (price === 0) return "0"
-  if (price < 0.001) return price.toFixed(6) // Use 6 decimal places for very small numbers
-  if (price < 0.01) return price.toFixed(5)
-  if (price < 1) return price.toFixed(4)
-  if (price < 10) return price.toFixed(3)
-  if (price < 1000) return price.toFixed(2)
-  return price.toLocaleString()
-}
+  const [isLoading, setIsLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(false);
+  const { toast } = useToast();
+  const { setUser } = useUser();
+  const checkingMiniKit = useRef(false);
+  const router = useRouter()
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  
+  const imagePaths = [
+    '/Asado_Wld.jpg',
+    '/Clip_World.png',
+    '/DNA_World.png',
+    '/Egg_World.png',
+    '/Free_World.png',
+    '/Golden_Wld.png',
+    '/Learn_world.png',
+    '/Orb_World.png',
+    '/Oro_World.jpg',
+    '/Sapien_Wld.jpg'
+  ]
 
-// Helper function to format total values with more precision
-const formatTotalValue = (value: number): string => {
-  if (value === 0) return "0"
-  if (value < 0.00000001) return value.toExponential(4)
-  if (value < 1) return value.toFixed(8)
-  if (value < 1000) return value.toFixed(2)
-  return value.toLocaleString()
-}
+const handleWalletConnected = async () => {
+    setAuthLoading(true);
 
-export default function Home() {
-  const [loading, setLoading] = useState(true)
-  const [projects, setProjects] = useState<Project[]>([])
-  const [tokenPrices, setTokenPrices] = useState<{ [key: string]: any }>({})
-  const [topGainer, setTopGainer] = useState<TopGainer | null>(null)
-  const [activeTab, setActiveTab] = useState<"holdings" | "trends">("trends")
+    try {
+      const result = await authenticateWithWallet();
 
-  // Calculate totals for the summary - using real-time prices when available
-  const totalValue = projects.reduce((sum, project) => {
-    const realTimePrice =
-      project.tokenAddress && tokenPrices[project.tokenAddress]?.price
-        ? Number(tokenPrices[project.tokenAddress].price)
-        : project.tokenPrice
-    return sum + realTimePrice * project.tokenAmount
-  }, 0)
-
-  const totalTokens = projects.length
-
-  // Load projects from JSON file
-  useEffect(() => {
-    async function loadProjects() {
-      try {
-        const response = await fetch("/data/projects.json")
-        const projectsData = await response.json()
-        setProjects(projectsData)
-      } catch (error) {
-        console.error("Error loading projects:", error)
-      }
-    }
-
-    loadProjects()
-  }, [])
-
-  // Find the top daily gainer when prices are updated
-  useEffect(() => {
-    if (projects.length === 0 || Object.keys(tokenPrices).length === 0) return
-
-    let bestProject: TopGainer | null = null
-    let highestChange = Number.NEGATIVE_INFINITY
-
-    projects.forEach((project) => {
-      if (project.tokenAddress && tokenPrices[project.tokenAddress]?.priceChange24h) {
-        const change = Number(tokenPrices[project.tokenAddress].priceChange24h)
-        if (change > highestChange) {
-          highestChange = change
-          bestProject = {
-            symbol: project.tokenSymbol,
-            change: change,
-            price: tokenPrices[project.tokenAddress].price
-              ? Number(tokenPrices[project.tokenAddress].price)
-              : project.tokenPrice,
-          }
+      if (result.success) {
+        // Store user data from authentication result
+        if (result.user) {
+          setUser(result.user);
         }
+        toast.success({
+          title: `Welcome ${result.user?.username || "User"}`,
+          duration: 3000,
+        });
+        // Navigate to chat page on successful auth
+        router.push("/home");
+        // router.push(`/chat/${welcomeAgentId}`);
+      } else {
+        toast.error({
+          title: "Authentication failed",
+          duration: 2000,
+        });
       }
-    })
-
-    setTopGainer(bestProject)
-  }, [projects, tokenPrices])
-
-  // Fetch token prices
-  useEffect(() => {
-    if (projects.length === 0) return
-
-    const fetchPrices = async () => {
-      try {
-        setLoading(true)
-        const tokenAddresses = projects.filter((project) => project.tokenAddress).map((project) => project.tokenAddress)
-
-        console.log("Fetching prices for:", tokenAddresses)
-        const prices = await getTokensPrices(tokenAddresses)
-        console.log("Prices", prices)
-        setTokenPrices(prices)
-        setLoading(false)
-      } catch (error) {
-        console.error("Error fetching prices:", error)
-        setLoading(false)
-      }
+    } catch (err: any) {
+      console.error("Auth error:", err);
+      toast.error({
+        title: "Authentication failed",
+        duration: 2000,
+      });
+    } finally {
+      setAuthLoading(false);
     }
+  };
 
-    fetchPrices()
+  useEffect(() => {
+    // Skip if we already started checking MiniKit
+    if (checkingMiniKit.current) return;
+    checkingMiniKit.current = true;
+    
+    const init = async () => {
+      // Check MiniKit installation
+      const checkMiniKit = async () => {
+        const isInstalled = MiniKit.isInstalled();
+        if (isInstalled) {
+          setIsLoading(false);
+        } else {
+          // Use a more controlled approach to avoid rapid state updates
+          setTimeout(checkMiniKit, 1000);
+        }
+      };
 
-    // Refresh prices every 30 seconds
-    const interval = setInterval(fetchPrices, 30000)
-    return () => clearInterval(interval)
-  }, [projects])
+      if (
+        process.env.NEXT_PUBLIC_APP_ENV === "test" ||
+        process.env.NEXT_PUBLIC_APP_ENV === "development"
+      ) {
+        // Skip MiniKit check in dev/test
+        setIsLoading(false);
+        console.log("Development mode -> minikit check skipped");
+      } else {
+        checkMiniKit();
+      }
+    };
 
-  // If projects are still loading
-  if (projects.length === 0) {
+    init();
+  }, []);
+
+  if (isLoading) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <div className="flex flex-col items-center justify-center p-8">
-          <div className="w-12 h-12 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mb-4"></div>
-          <p className="text-lg font-medium text-gray-600">Loading projects...</p>
+      <main
+        className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8 lg:p-12
+          bg-gradient-to-br from-slate-50 to-gray-100"
+      >
+        <div className="flex flex-col items-center justify-center text-center">
+          <svg
+            className="animate-spin h-10 w-10 text-slate-700"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="mt-4 text-lg font-medium text-slate-700">
+            Loading MiniKit...
+          </p>
         </div>
       </main>
-    )
+    );
   }
 
+  // Auto-rotate images every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imagePaths.length)
+    }, 3000)
+    
+    return () => clearInterval(interval)
+  }, [imagePaths.length])
+
   return (
-    <main className="flex flex-col min-h-screen bg-gray-50">
-      {/* <WalletHeader /> */}
-
-      {/* Main Container with Animation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="px-4 pb-6 max-w-md mx-auto w-full"
-      >
-        {/* Portfolio Value Card */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mt-6 mb-6">
-          {/* <div className="bg-gradient-to-r from-blue-600 to-blue-400 px-5 pt-6 pb-8">
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-sm font-medium text-blue-100 mb-1">Portfolio Value</h2>
-                <p className="text-3xl font-bold text-white">${formatTotalValue(totalValue)}</p>
-                <p className="text-xs text-blue-100 mt-1">{totalTokens} Projects</p>
-              </div>
-              <div className="bg-white bg-opacity-20 p-3 rounded-full">
-                <Wallet className="h-6 w-6 text-white" />
-              </div>
-            </div>
-          </div> */}
-
-          {/* Tabs for Holdings/Trends */}
-          {/* <div className="flex border-b">
-            <button
-              className={`flex-1 py-3 text-sm font-medium ${
-                activeTab === "holdings" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
+    <div className="relative h-screen w-full overflow-hidden bg-white text-black">
+      {/* Background elements */}
+      {/* <div className="absolute -right-20 top-0 h-screen w-1/2 bg-[#4ecdc4] opacity-80 transform -skew-x-12"></div> */}
+      <div className="absolute -left-40 bottom-0 h-40 w-full bg-blue-500 rounded-xl opacity-60 transform skew-x-12"></div>
+      
+      {/* Content container */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6">
+        {/* Logo/Title - removed motion */}
+        {/* Image Carousel - moved here */}
+        <div className="w-48 h-48 mb-6">
+          {imagePaths.map((path, index) => (
+            <div 
+              key={path}
+              className={`absolute transition-opacity duration-1000 ${
+                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
               }`}
-              onClick={() => setActiveTab("holdings")}
             >
-              Holdings
-            </button>
-            <button
-              className={`flex-1 py-3 text-sm font-medium ${
-                activeTab === "trends" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
-              }`}
-              onClick={() => setActiveTab("trends")}
-            >
-              Trends
-            </button>
-          </div> */}
-
-          {/* Holdings Section */}
-          {/* {activeTab === "holdings" && (
-            <div className="p-4">
-              <div className="bg-white rounded-xl p-6 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-blue-600" />
-                  </div>
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Holdings Feature</h2>
-                <p className="text-sm text-gray-600 mb-4">
-                  Advanced portfolio tracking is coming soon! We&apos;re working hard to bring you comprehensive insights
-                  into your crypto investments.
-                </p>
-                <div className="bg-blue-50 rounded-lg p-3">
-                  <p className="text-xs text-blue-800 flex items-center justify-center">
-                    <Clock className="w-4 h-4 mr-2" /> Stay tuned for updates
-                  </p>
-                </div>
+              <div className="w-48 h-48 rounded-full overflow-hidden">
+                <Image 
+                  src={path} 
+                  alt={`Carousel image ${index + 1}`} 
+                  width={75} 
+                  height={75}
+                  className="object-cover w-full h-full"
+                />
               </div>
             </div>
-          )} */}
-
-          {/* Top Gainer Section */}
-          {/* {activeTab === "trends" && topGainer && !loading && (
-            <div className="p-4">
-              <div className="bg-green-50 rounded-xl p-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700">Top Gainer (24h)</h3>
-                    <div className="flex items-center">
-                      <p className="text-lg font-bold text-green-600">{topGainer.symbol}</p>
-                      <span className="ml-2 text-sm font-medium text-green-600">+{topGainer.change.toFixed(2)}%</span>
-                    </div>
-                    <p className="text-xs text-gray-500">Price: ${formatPrice(topGainer.price)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
+          ))}
         </div>
 
-        {/* Projects List */}
-        <div className="mb-4">
-        <div className="relative bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl shadow-sm p-4 mb-6 max-w-md mx-auto w-full">
-      <div>
-        <h1 className="text-2xl font-bold mb-2 text-white">Projects</h1>
-        <p className="text-sm text-white/90">
-          Daily claims are available for all these projects
-        </p>
+        {/* Login form */}
+        <div className="w-full max-w-md">
+        <div className="mb-6 text-center">
+          <h1 className="font-serif text-6xl font-bold italic tracking-tighter text-blue-500">WorldAgg</h1>
+        </div>
+          {/* Login button with Worldcoin Wallet - removed motion */}
+          <div className="relative">
+            <WalletAuthButton onSuccess={handleWalletConnected} />
+            
+            <div className="mt-4 text-center text-sm text-black/60">
+              <p>Claim all tokens in one place</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute bottom-6 right-6 flex items-center gap-2 text-xs">
+          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+          <span className="font-mono">v1.0.0</span>
+        </div>
       </div>
-            {activeTab === "holdings" && (
-              <div className="text-sm text-gray-500 flex items-center">
-                <BarChart3 className="w-4 h-4 mr-1" /> {projects.length} total
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            {projects.map((project, index) => {
-              // Get real-time price if available, otherwise use the hardcoded price
-              const priceData = project.tokenAddress ? tokenPrices[project.tokenAddress] : null
-              const currentPrice = priceData?.price ? Number(priceData.price) : project.tokenPrice
-              const priceChange = priceData?.priceChange24h
-              const totalValue = currentPrice * project.tokenAmount
-              const isPriceUp = Number(priceChange || 0) >= 0
-
-              return (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden"
-                >
-                  <div className="p-4">
-                    {/* Header section with icon, name and price */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-blue-100 mr-3">
-                          <img
-                            src={project.tokenIcon || "/placeholder.svg"}
-                            alt={`${project.tokenSymbol} icon`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold">{project.name}</h3>
-                          <p className="text-sm text-gray-500">{project.tokenSymbol}</p>
-                        </div>
-                      </div>
-                      <div className={`px-3 py-1.5 rounded-full ${isPriceUp ? 'bg-green-100' : 'bg-red-100'} flex items-center`}>
-                        <span className={`text-sm font-medium ${isPriceUp ? 'text-green-700' : 'text-red-700'}`}>
-                          ${formatPrice(currentPrice)} {isPriceUp ? '↗' : '↘'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Token information section */}
-                    <div className="mt-4 bg-blue-50 rounded-xl p-4">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="text-sm text-blue-600 mb-1">You can earn</p>
-                          <div className="flex items-center">
-                            <Coins className="w-4 h-4 text-blue-600 mr-1" />
-                            <p className="text-lg font-bold text-blue-900">
-                              {project.tokenAmount} {project.tokenSymbol}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-blue-600 mb-1">Total value</p>
-                          <p className="text-lg font-bold text-blue-900">
-                            ${formatTotalValue(totalValue)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action button */}
-                    <div className="mt-4 flex justify-end">
-                      <a
-                        href={project.projectUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-2 font-medium flex items-center"
-                      >
-                        Earn
-                        <ArrowUpRight className="ml-1 h-4 w-4" />
-                      </a>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-      </motion.div>
-    </main>
+    </div>
   )
 }
 
