@@ -131,7 +131,7 @@ export const Login = () => {
           <Button
             onClick={handleLogout}
             variant="secondary"
-            size="md"
+            size="sm"
             disabled={loading}
           >
             {loading ? "Signing Out..." : "Sign Out"}
