@@ -28,7 +28,6 @@ export function FooterTabs() {
             )}
             <Home className={`h-5 w-5 ${isActive("/") ? "text-white" : "text-gray-500"}`} />
           </div>
-          <span className={`text-xs ${isActive("/") ? "font-medium" : ""}`}>Projects</span>
         </Link>
 
         <Link 
@@ -45,24 +44,6 @@ export function FooterTabs() {
             )}
             <Award className={`h-5 w-5 ${isActive("/missions") ? "text-white" : "text-gray-500"}`} />
           </div>
-          <span className={`text-xs ${isActive("/missions") ? "font-medium" : ""}`}>Missions</span>
-        </Link>
-        
-        <Link 
-          href="/projects" 
-          className="flex-1 flex flex-col items-center py-2"
-        >
-          <div className={`relative h-12 w-12 rounded-full flex items-center justify-center mb-1 ${
-            isActive("/projects") 
-              ? "bg-gradient-to-r from-blue-500 to-cyan-500 shadow-md" 
-              : "bg-gray-100"
-          }`}>
-            {isActive("/projects") && (
-              <div className="absolute -top-3 w-12 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
-            )}
-            <Compass className={`h-5 w-5 ${isActive("/projects") ? "text-white" : "text-gray-500"}`} />
-          </div>
-          <span className={`text-xs ${isActive("/projects") ? "font-medium" : ""}`}>Explore</span>
         </Link>
       </div>
     </div>

@@ -1,4 +1,5 @@
 export interface Mission {
+    // image: string
     id: string
     name: string
     description: string

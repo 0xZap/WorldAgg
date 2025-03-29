@@ -14,9 +14,10 @@ import {
   TrendingUp
 } from "lucide-react"
 import { Button } from "@worldcoin/mini-apps-ui-kit-react"
+import { useSession } from "next-auth/react"
 import { MissionsDiv } from "@/components/WalletHeader"
-import { useWallet } from "@/context/WalletContext"
 import { motion, AnimatePresence } from "framer-motion"
+import { Session } from "next-auth"
 
 // Group missions by category (difficulty level)
 const groupedMissions: Record<string, Mission[]> = {
@@ -25,7 +26,7 @@ const groupedMissions: Record<string, Mission[]> = {
 }
 
 export default function MissionsPage() {
-  const { user } = useWallet()
+  const { data: session } = useSession()
   const [claimedMissions, setClaimedMissions] = useState<string[]>([])
   const [missionProgress, setMissionProgress] = useState<Record<string, {
     isCompleted: boolean;
@@ -52,7 +53,7 @@ export default function MissionsPage() {
     const progressData: Record<string, any> = {}
     
     // Use connected wallet address if available
-    const addressToUse = user?.walletAddress || userAddress
+    const addressToUse = session?.data?.walletAddress || userAddress
     
     // Verify on-chain activity for all missions with on-chain verification
     for (const mission of missions) {
@@ -70,14 +71,14 @@ export default function MissionsPage() {
   useEffect(() => {
     // Load mission progress on initial load or when wallet changes
     loadMissionProgress()
-  }, [claimedMissions, userAddress, user])
+  }, [claimedMissions, userAddress, session])
 
   // Set user address when wallet connects
   useEffect(() => {
-    if (user?.walletAddress) {
-      setUserAddress(user.walletAddress)
+    if (session?.data?.walletAddress) {
+      setUserAddress(session.data.walletAddress)
     }
-  }, [user])
+  }, [session])
 
   const showToast = (title: string, description: string) => {
     setToastMessage({ title, description })
@@ -157,7 +158,7 @@ export default function MissionsPage() {
         <MissionsDiv />
 
         {/* User Stats Card */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+        {/* <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold">Your Stats</h2>
             <div className="flex items-center bg-blue-100 px-3 py-1 rounded-lg">
@@ -185,7 +186,7 @@ export default function MissionsPage() {
               <span className="font-medium">{claimedMissions.length} / {missions.length}</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Categories Section */}
         <div className="overflow-x-auto mb-6 -mx-1 px-1">
@@ -354,4 +355,3 @@ export default function MissionsPage() {
     </main>
   )
 }
-

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { getTokensPrices } from "../utils/getPriceData";
-import { WalletHeader } from "@/components/WalletHeader";
+// import { WalletHeader } from "@/components/WalletHeader";
 import { ArrowUpRight, ExternalLink, Info, TrendingUp, TrendingDown } from "lucide-react";
 import { motion } from "framer-motion";
 
